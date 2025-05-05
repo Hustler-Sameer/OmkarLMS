@@ -25,8 +25,10 @@ export default function RootLayout({
         className={`${dm_sans.className}`}
       >
         <Providers>
-
+        <div className="root-layout">
         {children}
+        </div>
+        
         </Providers>
       </body>
     </html>
