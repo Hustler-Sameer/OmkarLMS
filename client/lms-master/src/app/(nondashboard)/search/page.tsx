@@ -40,6 +40,10 @@ const Search = () => {
       animate={{ opacity: 0.9}}
       transition={{ duration: 0.5 }}
       className="search"
+      style={{
+        backgroundColor:"inherit",
+        color:"inherit"
+      }}
     >
       <h1 className="search__title">List of available courses</h1>
       <h2 className="search__subtitle">{courses.length} courses available</h2>
