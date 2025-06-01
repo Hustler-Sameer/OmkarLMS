@@ -5,10 +5,13 @@ import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import * as dynamoose from "dynamoose"
+import {clerkMiddleware, createClerkClient, requireAuth} from "@clerk/express";
+
 
 
 // Route imports 
-import courseRoutes from "./routes/courseRoutes"
+import courseRoutes from "./routes/courseRoutes";
+import userClerkRoutes from "./routes/userClerkRoutes";
 
 //Configuration
 
@@ -17,6 +20,10 @@ const isProduction = process.env.NODE_ENV === "production";
 if(!isProduction){
     dynamoose.aws.ddb.local();
 }
+
+export const clerkClient = createClerkClient({
+    secretKey: process.env.CLERK_SECRET_KEY
+})
 
 const app = express();
 
@@ -27,6 +34,7 @@ app.use(morgan("common"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(cors());
+app.use(clerkMiddleware());
 
 
 app.get("/", (req,res) => {
@@ -35,6 +43,8 @@ app.get("/", (req,res) => {
 });
 
 app.use("/courses",courseRoutes);
+//securing below end point
+app.use("/users/clerk",requireAuth(),userClerkRoutes);
 
 const port = process.env.PORT || 3000;
 if(!isProduction){

@@ -1,16 +1,21 @@
-// import { Request , Response } from "express";
+import { Request , Response } from "express";
+import { ClerkClient } from "@clerk/express";
+import { clerkClient } from "..";
 
-// export const getCourse = async (req: Request, res: Response): Promise<void> => {
-//   const { courseId } = req.params;
-//   try {
-//     const course = await Course.get(courseId);
-//     if (!course) {
-//       res.status(404).json({ message: "Course not found" });
-//       return;
-//     }
+export const updateUser = async (req: Request, res: Response): Promise<void> => {
+  console.log("Hello")
+  const { userId } = req.params;
+  const userData = req.body;
+  try {
+   const user =await clerkClient.users.updateUserMetadata(userId ,{
+    publicMetadata :{
+        userType: userData.publicMetadata.userType,
+        settings:userData.publicMetadata.settings
+    }
+   }, )
 
-//     res.json({ message: "Course retrieved successfully", data: course });
-//   } catch (error) {
-//     res.status(500).json({ message: "Error retrieving course", error });
-//   }
-// };
+    res.json({ message: "User updated successfully",data:user });
+  } catch (error) {
+    res.status(500).json({ message: "Error updating user", error });
+  }
+};

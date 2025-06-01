@@ -1,8 +1,10 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { BaseQueryApi, FetchArgs } from "@reduxjs/toolkit/query";
-import { url } from "inspector";
+
+import {User} from "@clerk/nextjs/server"
 // import { User } from "@clerk/nextjs/server";
-// import { Clerk } from "@clerk/clerk-js";
+import { Clerk } from "@clerk/clerk-js";
+import { toast } from "sonner";
 // import { toast } from "sonner";
 
 // const customBaseQuery = async (
@@ -255,12 +257,42 @@ const customBaseQuery = async (
     api:BaseQueryApi,
     extraOptions:{}
 ) => {
-    const baseQuery=fetchBaseQuery({baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL});
+    const baseQuery=fetchBaseQuery({
+        baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL,
+        // prepare headers are now on because we are now sending authentication details to backend with clerk middleware
+        prepareHeaders: async(headers) => {
+            const token = await window.Clerk?.session?.getToken();
+            if(token){
+                headers.set("Authorization", `Bearer ${token}`)
+            }
+            return headers; 
+        }
+
+
+    });
     try {
         const result:any = await baseQuery(args,api,extraOptions);
+         //added toaster below
+        if(result.error){
+            const errorData = result.error.data;
+            const errorMessage = errorData?.message || result.error.status.toString() || "An error occured";
+            toast.error(`Error: ${errorMessage}`);
+        }
+        const isMutationRequest = (args as FetchArgs).method && (args as FetchArgs).method !== "GET"
+        if(isMutationRequest){
+            const successMessage = result.data?.message;
+            if(successMessage) toast.success(successMessage);
+        }
         if(result.data){
             result.data=result.data.data
         }
+        else if(
+            result.error?.status === 204 ||
+            result.meta?.response.status === 204)
+            {
+                return {data:null}
+            }
+        
         return result;
     } catch (error:unknown) {
         const errorMessage = error instanceof Error ? error.message : "Unknown error";
@@ -273,9 +305,18 @@ const customBaseQuery = async (
 export const api = createApi({
     baseQuery: customBaseQuery,
     reducerPath:"api",
-    tagTypes:["Courses"],
+    tagTypes:["Courses","Users"],
     //tagtype are the response in which we recieve from api
     endpoints:(build) => ({
+        updateUser: build.mutation<User,Partial<User> & {userId:string}>({
+            query:({userId,...updatedUser}) => ({
+                url:`users/clerk/${userId}`,
+                method:"PUT",
+                body: updatedUser
+
+            }),
+            invalidatesTags:["Users"]
+        }),
         getCourses:build.query<Course[],{category?:string}>({
             query:({category}) => ({
                 url:"courses",
@@ -291,5 +332,5 @@ export const api = createApi({
     }),
 
 });
-
-export const {useGetCoursesQuery,useGetCourseQuery} = api;
+// we use mutation queries for PUT request
+export const {useGetCoursesQuery,useGetCourseQuery , useUpdateUserMutation} = api;
