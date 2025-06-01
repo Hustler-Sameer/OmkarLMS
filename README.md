@@ -1,0 +1,1 @@
+start local db by command: java -Djava.library.path=/Users/sameerkurkure/Downloads/dynamodb_local_latest -jar /Users/sameerkurkure/Downloads/dynamodb_local_latest/DynamoDBLocal.jar -sharedDb -dbPath /Users/sameerkurkure/Desktop/OmkarFinal/dbData
