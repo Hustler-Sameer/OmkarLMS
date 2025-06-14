@@ -329,8 +329,15 @@ export const api = createApi({
             providesTags:(result,error,id) => [{type:'Courses',id}]
             
         }),
+        createStripePaymentIntent : build.mutation<{clientSecret : string},{amount:Number}>({
+            query:({amount}) => ({
+                url:"/transactions/stripe/payment-intent",
+                method:"POST",
+                body:{amount},
+            })
+        })
     }),
 
 });
 // we use mutation queries for PUT request
-export const {useGetCoursesQuery,useGetCourseQuery , useUpdateUserMutation} = api;
+export const {useGetCoursesQuery,useGetCourseQuery , useUpdateUserMutation , useCreateStripePaymentIntentMutation} = api;

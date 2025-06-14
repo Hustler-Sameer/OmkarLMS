@@ -12,6 +12,7 @@ import {clerkMiddleware, createClerkClient, requireAuth} from "@clerk/express";
 // Route imports 
 import courseRoutes from "./routes/courseRoutes";
 import userClerkRoutes from "./routes/userClerkRoutes";
+import transactionRoutes from "./routes/transactionRoutes";
 
 //Configuration
 
@@ -45,6 +46,7 @@ app.get("/", (req,res) => {
 app.use("/courses",courseRoutes);
 //securing below end point
 app.use("/users/clerk",requireAuth(),userClerkRoutes);
+app.use("/transactions", requireAuth(), transactionRoutes)
 
 const port = process.env.PORT || 3000;
 if(!isProduction){

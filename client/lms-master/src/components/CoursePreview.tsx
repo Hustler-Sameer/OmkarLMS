@@ -9,7 +9,7 @@ const CoursePreview = ({ course }: CoursePreviewProps) => {
     <div className="course-preview">
       <div className="course-preview__container">
         <div className="course-preview__image-wrapper">
-          <Image
+          <img
             src={course.image || "/placeholder.png"}
             alt="Course Preview"
             width={640}
