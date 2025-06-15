@@ -5,6 +5,8 @@ import {User} from "@clerk/nextjs/server"
 // import { User } from "@clerk/nextjs/server";
 import { Clerk } from "@clerk/clerk-js";
 import { toast } from "sonner";
+import build from "next/dist/build";
+import { url } from "inspector";
 // import { toast } from "sonner";
 
 // const customBaseQuery = async (
@@ -329,15 +331,32 @@ export const api = createApi({
             providesTags:(result,error,id) => [{type:'Courses',id}]
             
         }),
+        getTransactions:  build.query<Transaction[] , string>({
+            query: (userId) => `transactions?userId=${userId}`
+        }),
         createStripePaymentIntent : build.mutation<{clientSecret : string},{amount:Number}>({
             query:({amount}) => ({
                 url:"/transactions/stripe/payment-intent",
                 method:"POST",
                 body:{amount},
             })
-        })
+        }),
+        createTransaction: build.mutation<Transaction,Partial<Transaction>> ({
+        query:(transaction) => ({
+            url:"transactions",
+            method:"POST",
+            body:transaction
+        }),
+    })
     }),
+
 
 });
 // we use mutation queries for PUT request
-export const {useGetCoursesQuery,useGetCourseQuery , useUpdateUserMutation , useCreateStripePaymentIntentMutation} = api;
+export const {useGetCoursesQuery,
+            useGetCourseQuery , 
+            useUpdateUserMutation ,
+            useCreateStripePaymentIntentMutation,
+            useCreateTransactionMutation,
+            useGetTransactionsQuery} 
+            = api;

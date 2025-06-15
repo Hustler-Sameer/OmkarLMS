@@ -6,6 +6,7 @@ import { useUser } from '@clerk/nextjs'
 import React from 'react'
 import CheckoutDetailsPage from './details';
 import PaymentPage from './payment';
+import CompletionPage from './completion';
 
 const CheckoutWizard = () => {
     const {isLoaded} = useUser();
@@ -19,9 +20,9 @@ const CheckoutWizard = () => {
             case 2: 
                 return <PaymentPage/>;
             case 3:
-                return "completion page";
+                return <CompletionPage/>;
             default:
-                return "checkout details page"
+                return <CheckoutDetailsPage/>;
         }
 
     };
